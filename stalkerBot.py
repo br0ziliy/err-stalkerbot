@@ -5,6 +5,12 @@ import logging
 log = logging.getLogger(__name__)
 
 class StalkerBot(BotPlugin):
+
+    def activate(self):
+        super(StalkerBot, self).activate()
+        if 'presence' not in self:
+            self['presence'] = {}
+
     def callback_message(self, mess):
         message = mess.body
         if not message:
@@ -13,16 +19,19 @@ class StalkerBot(BotPlugin):
         username = mess.frm.node
         log.debug("Recording presence of %s", username)
 
-        self[username] = {
+        presence = self['presence']
+        presence[username] = {
             'time': datetime.now(),
             'msg': message,
         }
+        self['presence'] = presence
 
     @botcmd
     def seen(self, mess, args):
         """ find out when someone last said something """
         requester = mess.frm.node
         username = str(args)
+        presence = self['presence']
 
         log.debug('{0} looking for {1}'.format(requester, username))
 
@@ -33,8 +42,8 @@ class StalkerBot(BotPlugin):
             return 'Hmm... seen whom?'
 
         try:
-            last_seen = self[username]['time']
-            last_msg = self[username]['msg']
+            last_seen = presence[username]['time']
+            last_msg = presence[username]['msg']
             return 'I last saw {0} {1} ago (on {2}) which said "{3}"'.format(
                 username,
                 format_timedelta(datetime.now() - last_seen),
