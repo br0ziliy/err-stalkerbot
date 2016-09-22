@@ -16,7 +16,7 @@ class StalkerBot(BotPlugin):
         if not message:
             return
 
-        username = mess.frm.node
+        username = mess.frm.nick
         log.debug("Recording presence of %s", username)
 
         presence = self['presence']
@@ -29,7 +29,7 @@ class StalkerBot(BotPlugin):
     @botcmd
     def seen(self, mess, args):
         """ find out when someone last said something """
-        requester = mess.frm.node
+        requester = mess.frm.nick
         username = str(args)
         presence = self['presence']
 
